@@ -206,7 +206,7 @@ if [ "$flag_logging" -eq 1 ]; then
             echo "$( $datecmd "+[%Y-%m-%d %H:%M:%S]" )[$$] $l"
         done >> "$logdir/$logfile" 
     ) 2>&1
-    ( cd "$logdir" || ln -sf "$logfile" "$logfile_link" )
+    ( cd "$logdir" && ln -sf "$logfile" "$logfile_link" )
 fi
 
 # main
