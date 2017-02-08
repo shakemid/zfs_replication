@@ -2,14 +2,13 @@
 
 # ZFS remote replication over SSH
 
-# 2013-10-09 created by K.Cima
+# Created by K.Cima https://github.com/shakemid/zfs_replication
 
 # settings
 
 set -o nounset
 
 export LANG=C
-export PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 datecmd=date
 sshcmd=ssh
@@ -190,6 +189,8 @@ do
         ;;
     esac
 done
+
+shift $(( OPTIND - 1 ))
 
 # show usage
 if [ -z "${target_host:-}" ] || [ -z "${src_dataset:-}" ] || [ -z "${dst_dataset:-}" ]; then
