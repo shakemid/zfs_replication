@@ -27,6 +27,8 @@ flag_delete_snapshot=1
 keep_src_snapshot=1
 keep_dst_snapshot=7
 
+zfs_list_snapshot='zfs list -t snapshot -r -d 1 -H -o name -S creation'
+
 # end of settings
 
 # usage
@@ -56,11 +58,11 @@ EOF
 # get snapshot name
 get_snapshot_name() {
     dst_suffix_prev=$( 
-        zfs list -t snapshot -r -d 1 -H -o name -S creation "$dst_dataset" | 
+        $zfs_list_snapshot "$dst_dataset" | 
         sed 's/^.*@//' | egrep "^${suffix_base}" | head -1 
     )
     src_suffix_prev=$( 
-        $sshcmd "$target_host" zfs list -t snapshot -r -d 1 -H -o name -S creation "$src_dataset" |
+        $sshcmd "$target_host" $zfs_list_snapshot "$src_dataset" |
         sed 's/^.*@//' | egrep "^${dst_suffix_prev}" | head -1 
     )
 
@@ -68,7 +70,7 @@ get_snapshot_name() {
         src_suffix_curr=${suffix_base}-$( $datecmd +%Y%m%d%H%M%S )
     else
         src_suffix_curr=$( 
-            $sshcmd "$target_host" zfs list -t snapshot -r -d 1 -H -o name -S creation "$src_dataset" | 
+            $sshcmd "$target_host" $zfs_list_snapshot "$src_dataset" | 
             sed 's/^.*@//' | egrep "^${suffix_base}" | head -1 
         )
     fi
@@ -122,7 +124,7 @@ delete_previous_snaphost() {
 
     echo deleting src snapshot
     (  
-        $sshcmd "$target_host" "zfs list -t snapshot -r -d 1 -H -o name -S creation $src_dataset | 
+        $sshcmd "$target_host" "$zfs_list_snapshot $src_dataset | 
             egrep "@${suffix_base}" | 
             tail +$(( keep_src_snapshot + 1 )) | 
             xargs -n 1 zfs destroy -r" 
@@ -131,7 +133,7 @@ delete_previous_snaphost() {
 
     echo deleting dst snapshot
     (
-        zfs list -t snapshot -r -d 1 -H -o name -S creation "$dst_dataset" | 
+        $zfs_list_snapshot "$dst_dataset" | 
         egrep "@${suffix_base}" | 
         tail +$(( keep_dst_snapshot + 1 )) | 
         xargs -n 1 zfs destroy -r 
