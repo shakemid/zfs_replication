@@ -15,9 +15,9 @@ datecmd=date
 sshcmd=ssh
 
 execdir=$( dirname "$0" )
-logdir=${execdir}/log
+logdir=$execdir/log
 logfile_link=zfs_replication.log
-logfile=${logfile_link}.$( $datecmd +%Y%m%d )
+logfile=$logfile_link.$( $datecmd +%Y%m%d )
 keep_logfile=365
 
 suffix_base=snapshot_for_replication
@@ -60,24 +60,24 @@ EOF
 get_snapshot_name() {
     dst_suffix_prev=$( 
         $zfs_list_snapshot "$dst_dataset" | 
-        sed 's/^.*@//' | egrep "^${suffix_base}" | head -1 
+        sed 's/^.*@//' | egrep "^$suffix_base" | head -1 
     )
     src_suffix_prev=$( 
         $sshcmd "$target_host" $zfs_list_snapshot "$src_dataset" |
-        sed 's/^.*@//' | egrep "^${dst_suffix_prev}" | head -1 
+        sed 's/^.*@//' | egrep "^$dst_suffix_prev" | head -1 
     )
 
     if [ "$flag_create_snapshot" -eq 1 ]; then
-        src_suffix_curr=${suffix_base}-$( $datecmd +%Y%m%d%H%M%S )
+        src_suffix_curr=$suffix_base-$( $datecmd +%Y%m%d%H%M%S )
     else
         src_suffix_curr=$( 
             $sshcmd "$target_host" $zfs_list_snapshot "$src_dataset" | 
-            sed 's/^.*@//' | egrep "^${suffix_base}" | head -1 
+            sed 's/^.*@//' | egrep "^$suffix_base" | head -1 
         )
     fi
 
-    snapshot_prev=${src_dataset}@${src_suffix_prev}
-    snapshot_curr=${src_dataset}@${src_suffix_curr}
+    snapshot_prev=$src_dataset@$src_suffix_prev
+    snapshot_curr=$src_dataset@$src_suffix_curr
 }
 
 # create snapshot
@@ -126,7 +126,7 @@ delete_previous_snaphost() {
     echo deleting src snapshot
     (  
         $sshcmd "$target_host" "$zfs_list_snapshot $src_dataset | 
-            egrep "@${suffix_base}" | 
+            egrep "@$suffix_base" | 
             tail +$(( keep_src_snapshot + 1 )) | 
             xargs -n 1 zfs destroy -r" 
     ) || rettmp1=$?
@@ -135,7 +135,7 @@ delete_previous_snaphost() {
     echo deleting dst snapshot
     (
         $zfs_list_snapshot "$dst_dataset" | 
-        egrep "@${suffix_base}" | 
+        egrep "@$suffix_base" | 
         tail +$(( keep_dst_snapshot + 1 )) | 
         xargs -n 1 zfs destroy -r 
     ) || rettmp2=$?
