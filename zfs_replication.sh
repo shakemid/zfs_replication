@@ -203,7 +203,7 @@ if [ "$flag_logging" -eq 1 ]; then
     exec > >( 
         while IFS= read -r l
         do 
-            echo "$( $datecmd "+[%Y-%m-%d %H:%M:%S]" )[$$] $l"
+            echo "$( $datecmd "+[%FT%T%z]" )[$$] $l"
         done >> "$logdir/$logfile" 
     ) 2>&1
     ( cd "$logdir" && ln -sf "$logfile" "$logfile_link" )
