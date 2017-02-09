@@ -6,7 +6,8 @@
 
 # settings
 
-set -o nounset
+set -o nounset 
+set -o pipefail
 
 export LANG=C
 
