@@ -156,6 +156,9 @@ purge_old_log() {
     return $rettmp
 }
 
+# save command line
+command_line="$0 $@"
+
 # parse options
 while getopts t:s:d:k:K:lFNDh opt
 do
@@ -214,6 +217,7 @@ fi
 
 # main
 echo executed. "$target_host:$src_dataset -> $dst_dataset"
+echo command line: "$command_line"
 
 retval=0
 (
