@@ -11,13 +11,12 @@ set -o pipefail
 
 export LANG=C
 
-datecmd=date
 sshcmd=ssh
 
 execdir=$( dirname "$0" )
 logdir=$execdir/log
 logfile_link=zfs_replication.log
-logfile=$logfile_link.$( $datecmd +%Y%m%d )
+logfile=$logfile_link.$( date +%Y%m%d )
 keep_logfile=365
 
 suffix_base=snapshot_for_replication
@@ -68,7 +67,7 @@ get_snapshot_name() {
     )
 
     if [ "$flag_create_snapshot" -eq 1 ]; then
-        src_suffix_curr=$suffix_base-$( $datecmd +%Y%m%d%H%M%S )
+        src_suffix_curr=$suffix_base-$( date +%Y%m%d%H%M%S )
     else
         src_suffix_curr=$( 
             $sshcmd "$target_host" $zfs_list_snapshot "$src_dataset" | 
@@ -209,7 +208,7 @@ if [ "$flag_logging" -eq 1 ]; then
     exec > >( 
         while IFS= read -r l
         do 
-            echo "$( $datecmd "+[%FT%T%z]" )[$$] $l"
+            echo "$( date "+[%FT%T%z]" )[$$] $l"
         done >> "$logdir/$logfile" 
     ) 2>&1
     ( cd "$logdir" && ln -sf "$logfile" "$logfile_link" )
