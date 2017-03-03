@@ -127,7 +127,7 @@ delete_previous_snaphost() {
         $sshcmd "$target_host" "$zfs_list_snapshot $src_dataset | 
             egrep "@$suffix_base" | 
             sed '1,${keep_src_snapshot}d' | 
-            xargs -n 1 -i sh -c \"test -n '{}' && zfs destroy -r '{}'\"" 
+            xargs -n 1 -i sh -c \"echo deleting {}; test -n '{}' && zfs destroy -r '{}'\"" 
     ) || rettmp1=$?
     echo return: $rettmp1
 
@@ -136,7 +136,7 @@ delete_previous_snaphost() {
         $zfs_list_snapshot "$dst_dataset" | 
         egrep "@$suffix_base" | 
         sed "1,${keep_dst_snapshot}d" | 
-        xargs -n 1 -i sh -c "test -n '{}' && zfs destroy -r '{}'"
+        xargs -n 1 -i sh -c "echo deleting {}; test -n '{}' && zfs destroy -r '{}'"
     ) || rettmp2=$?
     echo return: $rettmp2
 
