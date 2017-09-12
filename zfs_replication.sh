@@ -59,11 +59,11 @@ EOF
 get_snapshot_name() {
     dst_suffix_prev=$( 
         $zfs_list_snapshot "$dst_dataset" | 
-        sed 's/^.*@//' | egrep "^$suffix_base" | head -1 
+        sed 's/^.*@//' | egrep "^$suffix_base" | sed -n '1p'
     )
     src_suffix_prev=$( 
         $sshcmd "$target_host" $zfs_list_snapshot "$src_dataset" |
-        sed 's/^.*@//' | egrep "^$dst_suffix_prev" | head -1 
+        sed 's/^.*@//' | egrep "^$dst_suffix_prev" | sed -n '1p'
     )
 
     if [ "$flag_create_snapshot" -eq 1 ]; then
@@ -71,7 +71,7 @@ get_snapshot_name() {
     else
         src_suffix_curr=$( 
             $sshcmd "$target_host" $zfs_list_snapshot "$src_dataset" | 
-            sed 's/^.*@//' | egrep "^$suffix_base" | head -1 
+            sed 's/^.*@//' | egrep "^$suffix_base" | sed -n '1p'
         )
     fi
 
